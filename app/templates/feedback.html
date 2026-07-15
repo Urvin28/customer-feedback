@@ -3,7 +3,7 @@
 async function submitFeedback() {
 
     let rating = document.getElementById("rating").value;
-    let comment = document.getElementById("comment").value;
+    let comment = document.getElementById("comment").value.trim();
 
     if (!rating) {
         alert("Please select a rating.");
@@ -11,11 +11,17 @@ async function submitFeedback() {
     }
 
     try {
-
         let response = await fetch(
-            `/feedback?rating=${rating}&comment=${encodeURIComponent(comment)}`,
+            "/feedback",
             {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    rating: Number(rating),
+                    comment: comment
+                })
             }
         );
 

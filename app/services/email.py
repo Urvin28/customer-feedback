@@ -38,4 +38,8 @@ Comment:
 
     fm = FastMail(conf)
 
+    print("Sending email...")
+
     await fm.send_message(message)
+
+    print("Email sent successfully")
