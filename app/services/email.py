@@ -5,15 +5,14 @@ import os
 load_dotenv()
 
 
-
 conf = ConnectionConfig(
     MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
     MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
     MAIL_FROM=os.getenv("MAIL_FROM"),
-    MAIL_PORT=587,
+    MAIL_PORT=465,
     MAIL_SERVER="smtp.gmail.com",
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
+    MAIL_STARTTLS=False,
+    MAIL_SSL_TLS=True,
 )
 
 
@@ -21,6 +20,8 @@ async def send_feedback_email(
     rating: int,
     comment: str
 ):
+
+    print("EMAIL FUNCTION STARTED")
 
     message = MessageSchema(
         subject="New Customer Feedback",
@@ -39,7 +40,11 @@ Comment:
     fm = FastMail(conf)
 
     try:
+        print("CONNECTING TO EMAIL SERVER")
+
         await fm.send_message(message)
-        print("Email sent successfully")
+
+        print("EMAIL SENT SUCCESSFULLY")
+
     except Exception as e:
         print("EMAIL ERROR:", repr(e))
