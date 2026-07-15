@@ -35,11 +35,13 @@ async def create_feedback(
 
     print("Feedback saved to database")
 
+    print("adding email task")
     background_tasks.add_task(
-    send_feedback_email,
-    feedback.rating,
-    feedback.comment
+        send_feedback_email,
+        feedback.rating,
+        feedback.comment
 )
+    print("email task added")
 
     return {
         "message": "Feedback saved",
