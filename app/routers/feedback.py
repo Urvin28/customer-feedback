@@ -22,6 +22,7 @@ async def create_feedback(
     feedback: FeedbackCreate,
     db: Session = Depends(get_db)
 ):
+
     new_feedback = Feedback(
         rating=feedback.rating,
         comment=feedback.comment
@@ -30,10 +31,21 @@ async def create_feedback(
     db.add(new_feedback)
     db.commit()
     db.refresh(new_feedback)
-    await send_feedback_email(
-        feedback.rating,
-        feedback.comment
-    )
+
+    print("Feedback saved to database")
+
+    try:
+        print("Sending email...")
+
+        await send_feedback_email(
+            feedback.rating,
+            feedback.comment
+        )
+
+        print("Email sent successfully")
+
+    except Exception as e:
+        print("EMAIL ERROR:", e)
 
     return {
         "message": "Feedback saved",
