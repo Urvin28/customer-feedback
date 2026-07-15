@@ -1,5 +1,5 @@
 from app.services.email import send_feedback_email
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.database.database import SessionLocal
@@ -20,6 +20,7 @@ def get_db():
 @router.post("/feedback")
 async def create_feedback(
     feedback: FeedbackCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
 
@@ -34,18 +35,11 @@ async def create_feedback(
 
     print("Feedback saved to database")
 
-    try:
-        print("Sending email...")
-
-        await send_feedback_email(
-            feedback.rating,
-            feedback.comment
-        )
-
-        print("Email sent successfully")
-
-    except Exception as e:
-        print("EMAIL ERROR:", e)
+    background_tasks.add_task(
+    send_feedback_email,
+    feedback.rating,
+    feedback.comment
+)
 
     return {
         "message": "Feedback saved",
