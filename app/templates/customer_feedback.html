@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html>
 
@@ -7,86 +8,66 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <style>
 
-body {
-
-    font-family: Arial, sans-serif;
-    background: #f5f7fb;
-    margin: 0;
-    padding: 20px;
-
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f7fb;
+    margin:0;
+    padding:20px;
 }
 
-
-.container {
-
-    max-width: 420px;
-    margin: 40px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-
+.container{
+    max-width:420px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
 
-
-.logo {
-
-    font-size: 45px;
-    margin-bottom: 10px;
-
+.logo{
+    font-size:50px;
+    margin-bottom:10px;
 }
 
-
-h1 {
-
-    font-size: 24px;
-    margin-bottom: 5px;
-
+h1{
+    margin-bottom:5px;
 }
 
-
-.subtitle {
-
-    color: #666;
-    margin-bottom: 25px;
-
+.subtitle{
+    color:#666;
+    margin-bottom:25px;
 }
 
-
-
-.stars {
-
+.stars{
     display:flex;
     justify-content:center;
     gap:8px;
     margin:20px 0;
-
 }
 
-
-.stars span {
-
-    font-size:42px;
+.stars span{
+    font-size:48px;
     cursor:pointer;
     color:#ccc;
-
+    transition:all .2s;
+    user-select:none;
 }
 
-
-.stars span:hover {
-
-    transform:scale(1.1);
-
+.stars span:hover{
+    transform:scale(1.15);
 }
 
+#ratingText{
+    color:#666;
+    margin-bottom:20px;
+    min-height:22px;
+    font-weight:bold;
+}
 
-
-textarea {
-
+textarea{
     width:100%;
     height:120px;
     border-radius:12px;
@@ -95,13 +76,9 @@ textarea {
     font-size:16px;
     box-sizing:border-box;
     resize:none;
-
 }
 
-
-
-button {
-
+button{
     margin-top:20px;
     width:100%;
     padding:15px;
@@ -111,55 +88,37 @@ button {
     border-radius:12px;
     font-size:17px;
     cursor:pointer;
-
+    transition:.2s;
 }
 
-
-
-button:hover {
-
-    opacity:0.9;
-
+button:hover{
+    opacity:.9;
 }
 
-
-
-.success {
-
-    display:none;
-
+button:disabled{
+    background:#888;
+    cursor:not-allowed;
 }
-
 
 </style>
 
 </head>
 
-
 <body>
 
-
 <div class="container">
-
 
 <div class="logo">
 🏪
 </div>
 
-<h2>
-Quick Shop
-</h2>
+<h2>Quick Shop</h2>
 
-<h1>
-How was your visit?
-</h1>
-
+<h1>How was your visit?</h1>
 
 <p class="subtitle">
-Your feedback helps us serve you better
+Your feedback helps us serve you better.
 </p>
-
-
 
 <div class="stars">
 
@@ -171,148 +130,147 @@ Your feedback helps us serve you better
 
 </div>
 
+<p id="ratingText">
+Tap a star to rate us
+</p>
 
-<input 
+<input
 type="hidden"
 id="rating"
 value="0"
 >
 
-
 <textarea
 id="comment"
-placeholder="Tell us about your experience..."
+placeholder="Tell us about your experience (optional)..."
 ></textarea>
 
-
-
 <button onclick="submitFeedback()">
-
 Submit Feedback
-
 </button>
 
-
-<div class="success">
-
-<h2>
-Thank you! 🙏
-</h2>
-
-<p>
-We appreciate your feedback.
-</p>
-
 </div>
-
-
-</div>
-
-
 
 <script>
 
-
 function setRating(rating){
 
-document.getElementById("rating").value = rating;
+    document.getElementById("rating").value = rating;
 
+    const stars = document.querySelectorAll(".stars span");
 
-let stars=document.querySelectorAll(".stars span");
+    stars.forEach((star,index)=>{
 
+        if(index < rating){
 
-stars.forEach((star,index)=>{
+            star.innerHTML="★";
+            star.style.color="#fbbf24";
 
-if(index < rating){
+        }else{
 
-star.innerHTML="★";
-star.style.color="#fbbf24";
+            star.innerHTML="☆";
+            star.style.color="#ccc";
+
+        }
+
+    });
+
+    const messages = [
+        "",
+        "Poor 😞",
+        "Fair 🙂",
+        "Good 😊",
+        "Very Good 😃",
+        "Excellent 🤩"
+    ];
+
+    document.getElementById("ratingText").innerText = messages[rating];
 
 }
-
-else{
-
-star.innerHTML="☆";
-star.style.color="#ccc";
-
-}
-
-
-});
-
-
-}
-
-
 
 async function submitFeedback(){
 
+    const rating = document.getElementById("rating").value;
+    const comment = document.getElementById("comment").value.trim();
 
-let rating=document.getElementById("rating").value;
+    if(rating == 0){
 
-let comment=document.getElementById("comment").value;
+        alert("Please select a rating.");
 
+        return;
 
-if(rating == 0){
+    }
 
-alert("Please select a rating");
+    const button = document.querySelector("button");
 
-return;
+    button.disabled = true;
+    button.innerText = "Submitting...";
+
+    try{
+
+        const response = await fetch("/feedback",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                rating:Number(rating),
+                comment:comment
+
+            })
+
+        });
+
+        if(response.ok){
+
+            document.querySelector(".container").innerHTML = `
+
+            <div style="padding:40px 20px;">
+
+                <div style="font-size:75px;">✅</div>
+
+                <h1>Thank You!</h1>
+
+                <p style="color:#555;font-size:18px;">
+                    Your feedback has been submitted successfully.
+                </p>
+
+                <p style="margin-top:20px;color:#888;">
+                    We truly appreciate your time.
+                </p>
+
+                <h3 style="margin-top:35px;">
+                    Have a wonderful day! 😊
+                </h3>
+
+            </div>
+
+            `;
+
+        }else{
+
+            throw new Error();
+
+        }
+
+    }catch(error){
+
+        button.disabled = false;
+        button.innerText = "Submit Feedback";
+
+        alert("Something went wrong. Please try again.");
+
+    }
 
 }
-
-
-
-let response = await fetch("/feedback",{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-rating:Number(rating),
-
-comment:comment
-
-})
-
-
-});
-
-
-if(response.ok){
-
-document.querySelector(".container").innerHTML=`
-
-<h2>Thank you! 🙏</h2>
-
-<p>
-Your feedback means a lot to us.
-</p>
-
-`;
-
-}
-
-else{
-
-alert("Something went wrong");
-
-}
-
-
-}
-
-
 
 </script>
-
 
 </body>
 
 </html>
+
