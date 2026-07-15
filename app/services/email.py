@@ -16,7 +16,7 @@ conf = ConnectionConfig(
 )
 
 
-async def send_feedback_email(
+def send_feedback_email(
     rating: int,
     comment: str
 ):
@@ -42,7 +42,8 @@ Comment:
     try:
         print("CONNECTING TO EMAIL SERVER")
 
-        await fm.send_message(message)
+        import asyncio
+        asyncio.run(fm.send_message(message))
 
         print("EMAIL SENT SUCCESSFULLY")
 
